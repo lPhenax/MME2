@@ -15,9 +15,9 @@
 "use strict";
 
 // a singleton for ID generation
-var globalCounter = (function() {
+var globalCounter = (function () {
     var i = 100;
-    return function() {
+    return function () {
         return ++i;
     }
 
@@ -25,13 +25,15 @@ var globalCounter = (function() {
 
 // some default store content
 var tweets = [
-    {   id: globalCounter(),
+    {
+        id: globalCounter(),
         message: "Hello world tweet",
         creator: {
             href: "http://localhost:3000/users/103"
         }
     },
-    {   id: globalCounter(),
+    {
+        id: globalCounter(),
         message: "Another nice tweet",
         creator: {
             href: "http://localhost:3000/users/104"
@@ -39,11 +41,13 @@ var tweets = [
     }
 ];
 var users = [
-    {   id: globalCounter(),
+    {
+        id: globalCounter(),
         firstname: "Super",
         lastname: "Woman"
     },
-    {   id: globalCounter(),
+    {
+        id: globalCounter(),
         firstname: "Jane",
         lastname: "Doe"
     }
@@ -55,7 +59,7 @@ memory.tweets = tweets;
 memory.users = users;
 
 // private helper functions
-var checkElement = function(element) {
+var checkElement = function (element) {
     if (typeof(element) !== 'object') {
         throw new Error('Element is not an object to store', element);
     }
@@ -70,14 +74,14 @@ var store = {
      * @param {string or number} id - (optional) ID of element to select only one
      * @returns {[],{}, undefined} - undefined if nothing found, array of objects or one object only if ID was given
      */
-    select: function(type, id) {
+    select: function (type, id) {
         var list = memory[type];
         id = parseInt(id);
         if (list != undefined && list.length > 0 && !isNaN(id)) {
-            list = list.filter(function(element) {
+            list = list.filter(function (element) {
                 return element.id === id;
             });
-            list =  (list.length === 0)? undefined: list[0]; // only return the 1 found element; prevent empty []
+            list = (list.length === 0) ? undefined : list[0]; // only return the 1 found element; prevent empty []
         }
         return list; // may contain undefined, object or array;
     },
@@ -89,7 +93,7 @@ var store = {
      * @param {object} element
      * @returns {Number} the new id of the inserted element as a Number
      */
-    insert: function(type, element) {
+    insert: function (type, element) {
         checkElement(element);
         if (element.id !== undefined) {
             throw new Error("element already has an .id value, but should not on insert!");
@@ -107,16 +111,16 @@ var store = {
      * @param {object} newElement  needs to have .id property of same value as id
      * @returns {this} the store object itself for pipelining
      */
-    replace: function(type, id, newElement) {
+    replace: function (type, id, newElement) {
         var index = null;
         checkElement(newElement);
         var found = store.select(type, id);
         if (found === undefined) {
-            throw new Error('element with id '+id+' does not exist in store type '+type, newElement);
+            throw new Error('element with id ' + id + ' does not exist in store type ' + type, newElement);
         }
         id = parseInt(id);
         // now get the index of the element
-        memory[type].forEach(function(item, i) {
+        memory[type].forEach(function (item, i) {
             if (item.id === id) {
                 index = i;
             }
@@ -136,15 +140,15 @@ var store = {
      * @param {Number} id numerical id of element to remove
      * @returns {this} store object itself for pipelining
      */
-    remove: function(type, id) {
+    remove: function (type, id) {
         var index = null;
         var found = store.select(type, id);
         if (found === undefined) {
-            throw new Error('element with id '+id+' does not exist in store type '+type);
+            throw new Error('element with id ' + id + ' does not exist in store type ' + type);
         }
         id = parseInt(id);
         // now get the index of the element
-        memory[type].forEach(function(item, i) {
+        memory[type].forEach(function (item, i) {
             if (item.id === id) {
                 index = i;
             }
