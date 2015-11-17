@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+	<title>MM2 - Übg1</title>
+	<meta charset="UTF-8">
+	<meta name="keywords" content="miniyoutubeapp, html, JavaScript, CSS, Video">
+	<meta name="discription" content="Miniyoutubeapp">
+	<meta name="author" content="Burger, Ebert, Schleußner">
+	<link href="./css/uebg1.css" rel="stylesheet" type="text/css">
+	<!-- CSS from http://mrbool.com/how-to-style-the-html-5-video-element-with-javascript-and-css/27683 -->
+</head>
+<body>
+	<header>
+		<h1>Abgabe der ersten Übungsaufgabe</h1>
+		<h3>Die Aufgabe ist ""</h3>
+	</header>
+	<!--<nav>
+		<ul>
+			<li class=".cat1"><a href="#">Übung 1</a>
+				<ul><li><a href="#mainContent">Lösung</a></li></ul>
+			</li>
+			<li class=".cat2"><a href="#">Übung 2</a>
+				<ul><li><a href="#">Lösung</a></li></ul>
+			</li>
+			<li class=".cat3"><a href="#">Übung 3</a>
+				<ul><li><a href="#">Lösung</a></li></ul>
+			</li>
+			<li class=".cat4"><a href="#">Übung 4</a>
+				<ul><li><a href="#">Lösung</a></li></ul>
+			</li>
+			<li class=".cat5"><a href="#">Übung 5</a>
+				<ul><li><a href="#">Lösung</a></li></ul>
+			</li>
+			<li class=".cat6"><a href="#">Übung 6</a>
+				<ul><li><a href="#">Lösung</a></li></ul>
+			</li>
+		</ul>
+	</nav>-->
+	<main>
+		<section id="mainContent">
+			<div id="div_video">
+				<div id="div_videoName">
+					<span>Gute Laune!</span>	
+				</div>					
+				<video id="video" poster="files/affe.png">
+					<source src="files/affentanz.mp4" type="video/mp4">
+					<source src="files/affentanz.ogv" type="video/ogg">
+					<source src="files/affentanz.webm" type="video/webm">
+					Dieser Browser kann das Video nichts abspielen!
+				</video>
+				<div id="div_slider">
+					<label id="label_playtime:">playtime:</label>
+					<span id="span_videotime_Text"></span>
+					<input id="slider_videotime" type="range">					
+				</div>
+				<div id="div_btnBar">
+					<button id="btn_play_pause">play/pause</button>
+					<button id="btn_reset">reset</button>
+					<label id="label_volume mute">volume mute</label>
+					<input id="checkbox_volume" type="checkbox">
+					<button id="btn_slower">slower</button>
+					<button id="btn_faster">faster</button>
+				</div>
+			</div>
+		</section>
+	</main>
+	<aside>
+		<section id="sideContent">
+			<div id="div_videoGroup">
+				<div id="div_btnBar2">
+					<button id="btn2_play_pause">play</button>
+					<button id="btn2_reset">reset</button>
+				</div><br>
+				<video id="video1">
+					<source src="files/affentanz.mp4" type="video/mp4">
+					<source src="files/affentanz.ogv" type="video/ogg">
+					<source src="files/affentanz.webm" type="video/webm">
+					Dieser Browser kann das Video nichts abspielen!
+				</video>
+				<video id="video2">
+					<source src="files/affentanz.mp4" type="video/mp4">
+					<source src="files/affentanz.ogv" type="video/ogg">
+					<source src="files/affentanz.webm" type="video/webm">
+					Dieser Browser kann das Video nichts abspielen!
+				</video>
+				<video id="video3">
+					<source src="files/affentanz.mp4" type="video/mp4">
+					<source src="files/affentanz.ogv" type="video/ogg">
+					<source src="files/affentanz.webm" type="video/webm">
+					Dieser Browser kann das Video nichts abspielen!
+				</video>
+			</div>
+		</section>
+	</aside>
+	<footer>
+		<span>Diese Abgabe ist von Andreas Burger(s812576), Vivien Ebert(s806998) und Daniel Schleußner(s793388).</span>
+	</footer>
+	<script src="./js/uebg1.js" type="text/javascript"></script>
+</body>
+</html>
