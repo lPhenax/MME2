@@ -64,7 +64,6 @@ app.use(function(req, res, next) {
 
 // Routes ***************************************
 
-/* tweets */
 app.get('/tweets', function(req,res,next) {
     res.json(store.select('tweets'));
 });
@@ -90,29 +89,6 @@ app.put('/tweets/:id', function(req,res,next) {
     res.status(200).end();
 });
 
-/* users */
-app.route('/users')
-    .get(function(req, res){
-        res.json(store.select('users'));
-    })
-    .post(function(req, res){
-        var id = store.insert('users', req.body); // TODO check that the element is really a user!
-        // set code 201 "created" and send the item back
-        res.status(201).json(store.select('users', id));
-    });
-
-app.route('/users/:id')
-    .get(function(req, res) {
-        res.json(store.select('users', req.params.id));
-    })
-    .put(function(req, res){
-        store.replace('users', req.params.id, req.body);
-        res.status(200).end();
-    })
-    .delete(function(req, res) {
-        store.remove('users', req.params.id);
-        res.status(200).end();
-    });
 
 // TODOs
 // TODO: some HTTP error responses in case not found
