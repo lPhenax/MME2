@@ -7,6 +7,7 @@
  * @author Johannes Konert
  * @licence CC BY-SA 4.0
  *
+ * changes by Burger, Ebert & Schleußner
  */
 "use strict";
 
@@ -69,16 +70,18 @@ app.get('/tweets', function (req, res, next) {
     var url = req.protocol + '://' + req.get('host') + req.originalUrl;
     var tweets = [];
     for (var i = 0; i < list.length; i++) {
-        tweets.push({
-            'href': url + '/' + list[i].id,
-            id: list[i].id,
-            message: list[i].message,
-            creator: list[i].creator
-        })
+        if (list[i] !== undefined) {
+            tweets.push({
+                'href': url + '/' + list[i].id,
+                id: list[i].id,
+                message: list[i].message,
+                creator: list[i].creator
+            })
+        }
     }
     res.json({
         href: url,
-        rel: tweets
+        items: tweets
     })
 });
 
@@ -93,7 +96,7 @@ app.post('/tweets', function (req, res, next) {
 app.get('/tweets/:id', function (req, res, next) {
     res.json({
         href: req.protocol + '://' + req.get('host') + req.originalUrl,
-        rel: store.select('tweets', req.params.id)
+        items: store.select('tweets', req.params.id)
     })
 });
 
@@ -108,34 +111,31 @@ app.put('/tweets/:id', function (req, res, next) {
 });
 
 /* users */
+/**
+ * Route für /users angegeben und hier werden die Methoden get und push angeboten.
+ */
 app.route('/users')
     .get(function (req, res) {
         var url = req.protocol + '://' + req.get('host') + req.originalUrl;
         var allUsers = store.select('users');
-        var allTweets = store.select('tweets');
         var users = [];
         for (var k = 0; k < allUsers.length; k++) {
-            var allTweetsFromUser = [];
-            for (var j = 0; j < allTweets.length; j++) {
-                console.log("iam here " + allTweets[j].creator.href + ' == ' + url+allUsers[k].id);
-                if (allTweets[j].creator.href == url + allUsers[k].id) {
-                    allTweetsFromUser.push({
-                        message: allTweets[j].message
-                    });
-                }
+            if (allUsers[k] !== undefined) {
+                users.push({
+                    'href': url + allUsers[k].id,
+                    id: allUsers[k].id,
+                    firstname: allUsers[k].firstname,
+                    lastname: allUsers[k].lastname,
+                    'tweets': {
+                        //href: allTweetsFromUser
+                        href: url + '/' + allUsers[k].id + '?expand=' + 'tweets'
+                    }
+                });
             }
-            users.push({
-                'href': url + allUsers[k].id,
-                id: allUsers[k].id,
-                firstname: allUsers[k].firstname,
-                lastname: allUsers[k].lastname,
-                'tweets': allTweetsFromUser
-            });
-            console.log("round done!");
         }
         res.json({
                 href: url,
-                rel: users
+                items: users
             }
         )
     })
@@ -145,11 +145,41 @@ app.route('/users')
         res.status(201).json(store.select('users', id));
     });
 
+/**
+ * Route für /users/id angegeben und hier werden die Methoden get und push angeboten.
+ * plus Feature ?expand=tweets
+ */
 app.route('/users/:id')
     .get(function (req, res) {
+        var url = req.protocol + '://' + req.get('host') + req.originalUrl;
+        var user = store.select('users', req.params.id);
+        var urlTweets = url + '?expand=' + 'tweets';
+        var allTweets = store.select('tweets');
+        if (user !== undefined) {
+            if (url == req.protocol + '://' + req.get('host') + '/users/' + user.id + '?expand=tweets') {
+                urlTweets = [];
+                for (var j = 0; j < allTweets.length; j++) {
+                    //console.log("iam here " + allTweets[j].creator.href + '?expand=' + 'tweets' + ' == ' + url);
+                    if (allTweets[j].creator.href + '?expand=' + 'tweets' == url) {
+                        urlTweets.push({
+                            message: allTweets[j].message
+                        });
+                    }
+                }
+            }
+        }
+
         res.json({
-            href: req.protocol + '://' + req.get('host') + req.originalUrl,
-            rel: store.select('users', req.params.id)
+            href: url,
+            items: {
+                id: user.id,
+                firstname: user.firstname,
+                lastname: user.lastname,
+                'tweets': {
+                    //href: allTweetsFromUser
+                    href: urlTweets
+                }
+            }
         })
     })
     .put(function (req, res) {
@@ -161,6 +191,7 @@ app.route('/users/:id')
         store.remove('users', req.params.id);
         res.status(200).end();
     });
+
 
 // TODOs
 // TODO: some HTTP error responses in case not found
