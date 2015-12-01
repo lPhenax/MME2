@@ -26,8 +26,34 @@ var globalCounter = (function() {
 
 })();
 
+//var videos = [
+//    {
+//        id: globalCounter(),
+//        title: "Hello World",
+//        description: "...",
+//        src: "../videos/affentanz.mp4",
+//        length: 20000,
+//        timestamp: Date.now(),
+//        playcount: 1,
+//        ranking:2
+//    },
+//    {
+//        id: globalCounter(),
+//        title: "Test",
+//        description: "...2",
+//        src: "../videos/small.mp4",
+//        length: 2000,
+//        timestamp: Date.now(),
+//        playcount: 5,
+//        ranking:1
+//    }
+//];
+var videos = [];
+
+
 // our "in memory database" is a simple object!
 var memory = {};
+memory.videos = videos;
 // some default store content could be added here
 
 
@@ -119,7 +145,8 @@ var store = {
         var index = null;
         var found = store.select(type, id);
         if (found === undefined) {
-            throw new Error('element with id '+id+' does not exist in store type '+type);
+            return found;
+            //throw new Error('element with id '+id+' does not exist in store type '+type);
         }
         id = parseInt(id);
         // now get the index of the element

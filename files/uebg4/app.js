@@ -44,8 +44,7 @@ app.use(restAPIchecks);
 
 // Routes ******************************************************
 app.use('/videos', videos);
-
-
+// logging
 
 
 
@@ -59,7 +58,6 @@ app.use(function(req, res, next) {
     err.status = 404;
     next(err);
 });
-
 
 // error handlers (express recognizes it by 4 parameters!)
 // development error handler
