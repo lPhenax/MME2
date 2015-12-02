@@ -34,11 +34,13 @@ var internalKeys = {id: 'number', timestamp: 'number'};
 videos.route('/')
     .get(function (req, res, next) {
         var url = req.url;
+        //console.log(req.url);
         if (req.url == "/") {
             var selectionList = store.select('videos', null);
             if (selectionList.length == 0) {
                 res.set('Content-Type', 'application/json');
                 res.status(204).end();
+                return;
             }
             req.body = selectionList;
             res.set('Content-Type', 'application/json');
@@ -56,58 +58,65 @@ videos.route('/')
             if (limitAndOffset.length > 13) {
                 var splitLimitAndOffset = limitAndOffset.split("&");
                 var afterSplitTwo_SplitInParam = [];
-                console.log(splitLimitAndOffset);
+                //console.log(splitLimitAndOffset);
                 for (var i = 0; i < splitLimitAndOffset.length; i++) {
                     afterSplitTwo_SplitInParam.push(splitLimitAndOffset[i].split("="));
                 }
-                console.log(afterSplitTwo_SplitInParam);
+                //console.log(afterSplitTwo_SplitInParam);
                 var selectionListWithMoreParams = store.select('videos', null);
                 if (selectionListWithMoreParams.length == 0) {
                     res.set('Content-Type', 'application/json');
                     res.status(204).end();
+                    return;
                 }
                 for (var a = 0; a < afterSplitTwo_SplitInParam.length; a++) {
                     var currentParam = afterSplitTwo_SplitInParam[a];
-                    console.log(currentParam);
+                    //console.log(currentParam);
                     if (currentParam[0] == "offset") {
                         offset = currentParam[1];
-                        try{
+                        try {
                             offset = parseInt(offset);
                         } catch (err) {
-                            console.log("not a number");
+                            //console.log("not a number");
                             res.set('Content-Type', 'application/json');
                             res.status(400).end();
                         }
-                        if (offset == 0 ||  typeof offset !== 'number' ) {
+                        if (offset <= 0 || typeof offset !== 'number' || isNaN(offset)
+                            || offset == selectionListWithMoreParams.length) {
                             res.set('Content-Type', 'application/json');
                             res.status(400).end();
+                            return;
                         }
                     } else if (currentParam[0] == "limit") {
                         limit = currentParam[1];
-                        if (limit <= 0 ||  typeof limit !== 'number') {
+                        try {
+                            limit = parseInt(limit);
+                        } catch (err) {
+                            //console.log("not a number");
                             res.set('Content-Type', 'application/json');
                             res.status(400).end();
                         }
+                        if (limit <= 0 || typeof limit !== 'number' || isNaN(limit)) {
+                            res.set('Content-Type', 'application/json');
+                            res.status(400).end();
+                            return;
+                        }
                     } else {
                         res.end();
+                        return;
                     }
                 }
-                if (offset < 0) {
-                    for (var j = 0;
-                         (j < limit); j++) {
-                        tempArr.push(selectionListWithMoreParams[j +
-                        (selectionListWithMoreParams.length - offset)]);
-                    }
+                var typeLimit = 0;
+                if (limit > selectionListWithMoreParams.length) {
+                    typeLimit = selectionListWithMoreParams.length;
                 } else {
-                    var typeLimit = 0;
-                    if(limit > selectionListWithMoreParams.length) {
-                        typeLimit = selectionListWithMoreParams.length;
-                    } else {
-                        typeLimit = limit;
-                    }
-                    for (var j = 0; j < typeLimit; j++) {
-                        tempArr.push(selectionListWithMoreParams[j + offset]);
-                    }
+                    typeLimit = limit;
+                }
+                if (offset+typeLimit > selectionListWithMoreParams.length) {
+                    typeLimit -= offset;
+                }
+                for (var j = 0; j < typeLimit; j++) {
+                    tempArr.push(selectionListWithMoreParams[j+offset]);
                 }
             } else {
                 var param = limitAndOffset.split("=");
@@ -116,13 +125,15 @@ videos.route('/')
                 if (selectionListWithOneParam.length == 0) {
                     res.set('Content-Type', 'application/json');
                     res.status(204).end();
+                    return;
                 }
 
                 if (param[0] == "offset") {
                     offset = param[1];
-                    if(offset < 0){
+                    if (offset < 0) {
                         res.set('Content-Type', 'application/json');
                         res.status(400).end();
+                        return;
                     }
 
                     for (var i = offset; i < selectionListWithOneParam.length; i++) {
@@ -130,21 +141,23 @@ videos.route('/')
                     }
                 } else if (param[0] == "limit") {
                     limit = param[1];
-                    if(limit <= 0) {
+                    if (limit <= 0) {
                         res.set('Content-Type', 'application/json');
                         res.status(400).end();
+                        return;
                     }
                     for (var i = 0; i < limit; i++) {
                         tempArr.push(selectionListWithOneParam[i]);
                     }
                 } else {
                     res.end();
+                    return;
                 }
             }
-            req.body = tempArr;
-            console.log("ich bin durch2");
+            //console.log("ich bin durch2");
+            //console.log(tempArr);
             res.set('Content-Type', 'application/json');
-            res.status(200).json(req.body).end();
+            res.status(200).json(tempArr).end();
         }
 
     })
@@ -187,7 +200,7 @@ videos.route('/:id')
                     res.status(400).end();
                 }
             }
-            console.log(arr);
+            //console.log(arr);
             req.body.keys = arr;
             res.status(200).json(req.body.keys);
         }
