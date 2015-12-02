@@ -33,65 +33,185 @@ var internalKeys = {id: 'number', timestamp: 'number'};
 // routes **********************
 videos.route('/')
     .get(function (req, res, next) {
+        var url = req.url;
+        if (req.url == "/") {
+            var selectionList = store.select('videos', null);
+            if (selectionList.length == 0) {
+                res.set('Content-Type', 'application/json');
+                res.status(204).end();
+            }
+            req.body = selectionList;
+            res.set('Content-Type', 'application/json');
+            res.status(200).json(req.body).end();
+        } else {
+            var limitAndOffset = url.substring(2, url.length);
+            var tempArr = [];
+            var offset = 0;
+            var limit = 0;
+            /**
+             * if
+             * true --> more params --> split("&") --> split("=")
+             * else --> one param (offset or limit)--> split("=")
+             */
+            if (limitAndOffset.length > 13) {
+                var splitLimitAndOffset = limitAndOffset.split("&");
+                var afterSplitTwo_SplitInParam = [];
+                console.log(splitLimitAndOffset);
+                for (var i = 0; i < splitLimitAndOffset.length; i++) {
+                    afterSplitTwo_SplitInParam.push(splitLimitAndOffset[i].split("="));
+                }
+                console.log(afterSplitTwo_SplitInParam);
+                var selectionListWithMoreParams = store.select('videos', null);
+                if (selectionListWithMoreParams.length == 0) {
+                    res.set('Content-Type', 'application/json');
+                    res.status(204).end();
+                }
+                for (var a = 0; a < afterSplitTwo_SplitInParam.length; a++) {
+                    var currentParam = afterSplitTwo_SplitInParam[a];
+                    console.log(currentParam);
+                    if (currentParam[0] == "offset") {
+                        offset = currentParam[1];
+                        try{
+                            offset = parseInt(offset);
+                        } catch (err) {
+                            console.log("not a number");
+                            res.set('Content-Type', 'application/json');
+                            res.status(400).end();
+                        }
+                        if (offset == 0 ||  typeof offset !== 'number' ) {
+                            res.set('Content-Type', 'application/json');
+                            res.status(400).end();
+                        }
+                    } else if (currentParam[0] == "limit") {
+                        limit = currentParam[1];
+                        if (limit <= 0 ||  typeof limit !== 'number') {
+                            res.set('Content-Type', 'application/json');
+                            res.status(400).end();
+                        }
+                    } else {
+                        res.end();
+                    }
+                }
+                if (offset < 0) {
+                    for (var j = 0;
+                         (j < limit); j++) {
+                        tempArr.push(selectionListWithMoreParams[j +
+                        (selectionListWithMoreParams.length - offset)]);
+                    }
+                } else {
+                    var typeLimit = 0;
+                    if(limit > selectionListWithMoreParams.length) {
+                        typeLimit = selectionListWithMoreParams.length;
+                    } else {
+                        typeLimit = limit;
+                    }
+                    for (var j = 0; j < typeLimit; j++) {
+                        tempArr.push(selectionListWithMoreParams[j + offset]);
+                    }
+                }
+            } else {
+                var param = limitAndOffset.split("=");
+                //noinspection JSDuplicatedDeclaration
+                var selectionListWithOneParam = store.select('videos', null);
+                if (selectionListWithOneParam.length == 0) {
+                    res.set('Content-Type', 'application/json');
+                    res.status(204).end();
+                }
 
-        //res.status(200).json(store.select('videos'));
-        next();
+                if (param[0] == "offset") {
+                    offset = param[1];
+                    if(offset < 0){
+                        res.set('Content-Type', 'application/json');
+                        res.status(400).end();
+                    }
+
+                    for (var i = offset; i < selectionListWithOneParam.length; i++) {
+                        tempArr.push(selectionListWithOneParam[i]);
+                    }
+                } else if (param[0] == "limit") {
+                    limit = param[1];
+                    if(limit <= 0) {
+                        res.set('Content-Type', 'application/json');
+                        res.status(400).end();
+                    }
+                    for (var i = 0; i < limit; i++) {
+                        tempArr.push(selectionListWithOneParam[i]);
+                    }
+                } else {
+                    res.end();
+                }
+            }
+            req.body = tempArr;
+            console.log("ich bin durch2");
+            res.set('Content-Type', 'application/json');
+            res.status(200).json(req.body).end();
+        }
+
     })
     .post(function (req, res, next) {
-        if (req.url != '/') res.status(405).end();
-        console.log(req.body.timestamp);
-        if(/*req.body.title == 404 || req.body.src == 404 || req.body.length == 404*/ req.body.timestamp) {
-            //res.body.timestamp = Date.now();
-            console.log("...bin hier");
-            res.status(400).end();
-        } else {
-            console.log("...bin hier2");
-            var id = store.insert('videos', req.body);
-            id.timestamp = new Date();
-            // set code 201 "created" and send the item back
-            res.status(201).json(store.select('videos', id));
-        }
+        req.body.timestamp = new Date().getTime();
+        if (req.body.playcount === undefined) req.body.playcount = 0;
+        if (req.body.ranking === undefined) req.body.ranking = 0;
+        var id = store.insert('videos', req.body);
+        // set code 201 "created" and send the item back
+        res.status(201).json(store.select('videos', id));
+
     })
     .put(function (req, res, next) {
-        res.status(405).end();
+        var fehler = {error: {message: "Method Not Allowed", code: 405}};
+        if (req.body.error == undefined) req.body.error = fehler;
+        res.set('Content-Type', 'application/json');
+        res.status(405).json(req.body.error);
     });
 videos.route('/:id')
     .get(function (req, res, next) {
-        res.status(200).json(store.select('videos', req.params.id));
+
+        var url = req.url;
+        var kindOf = url.substring(0, 12);
+        if (kindOf == "/" + req.params.id + "?filter=") {
+            var filterPart = url.substring(12, url.length);
+            var filterPara = filterPart.split("%2C");
+            var arr = {};
+            for (var i = 0; i < filterPara.length; i++) {
+                var vidArr = store.select('videos', null);
+                var para = filterPara[i];
+                if (para == "src") for (var j = 0; j < vidArr.length; j++) arr[para] = vidArr[j].src;
+                else if (para == "title") for (var j = 0; j < vidArr.length; j++) arr[para] = vidArr[j].title;
+                else if (para == "length") for (var j = 0; j < vidArr.length; j++) arr[para] = vidArr[j].length;
+                else if (para == "timestamp") for (var j = 0; j < vidArr.length; j++) arr[para] = vidArr[j].timestamp;
+                else if (para == "id") for (var j = 0; j < vidArr.length; j++) arr[para] = vidArr[j].id;
+                else if (para == "ranking") for (var j = 0; j < vidArr.length; j++) arr[para] = vidArr[j].ranking;
+                else if (para == "description") for (var j = 0; j < vidArr.length; j++) arr[para] = vidArr[j].description;
+                else if (para == "playcount") for (var j = 0; j < vidArr.length; j++) arr[para] = vidArr[j].playcount;
+                else {
+                    res.status(400).end();
+                }
+            }
+            console.log(arr);
+            req.body.keys = arr;
+            res.status(200).json(req.body.keys);
+        }
     })
     .post(function (req, res, next) {
-        if (req.url != '/') res.status(405).end();
+        var fehler = {error: {message: "Method Not Allowed", code: 405}};
+        if (req.body.error == undefined) req.body.error = fehler;
+        res.set('Content-Type', 'application/json');
+        res.status(405).json(req.body.error);
     })
     .delete(function (req, res, next) {
-        res.set('Content-Type', 'application/json');
-        var deletedItem = store.remove('videos', req.params.id);
-        //console.log(deletedItem);
-        if (deletedItem === undefined) {
-            //console.log("iam here..");
-            res.status(404).end();
-        } else {
+        if (store.select('videos', req.params.id) != undefined) {
+            store.remove('videos', req.params.id);
+            res.set('Content-Type', 'application/json');
             res.status(204).end();
         }
+        var fehler = {error: {message: "Method Not Allowed", code: 404}};
+        if (req.body.error == undefined) req.body.error = fehler;
+        res.set('Content-Type', 'application/json');
+        res.status(404).json(req.body.error);
     })
     .put(function (req, res, next) {
         store.replace('videos', req.params.id, req.body);
         res.status(200).json(store.select('videos', req.params.id)).end();
     });
-
-// this middleware function can be used, if you like or remove it
-videos.use(function (req, res, next) {
-    // if anything to send has been added to res.locals.items
-    //console.log(res.locals.items);
-    if (res.locals.items) {
-        // then we send it as json and remove it
-        res.json(res.locals.items);
-        delete res.locals.items;
-
-    } else {
-        // otherwise we set status to no-content
-        res.set('Content-Type', 'application/json');
-        res.status(204).end(); // no content;
-    }
-});
 
 module.exports = videos;
