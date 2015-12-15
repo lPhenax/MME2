@@ -1,25 +1,20 @@
 {
-  "name": "U4CodePack",
-  "author": "Johannes Konert",
+  "name": "U5CodePack",
+  "author": "Johannes Konert, Andreas Burger, Vivien Ebert, Daniel Schleußner",
   "licence": "CC BY-SA 4.0",
   "version": "0.0.1",
-  "description": "Initial code set for exercise 4 (implementing an REST API after designed mocha tests)",
+  "description": "Initial code set for exercise 5 (implementing an REST API for videos and connect them to mongoDB via mongoose)",
   "private": true,
   "scripts": {
-    "start": "node app.js",
-    "test": "mocha"
+    "start": "node app.js"
   },
   "dependencies": {
     "body-parser": "~1.13.2",
     "debug": "~2.2.0",
     "express": "~4.13.1",
-    "mongoose": "^4.2.10",
+    "mongoose": "^4.3.1",
     "morgan": "~1.6.1",
     "serve-favicon": "~2.3.0"
   },
-  "devDependencies": {
-    "should": "^7.1.1",
-    "should-http": "0.0.4",
-    "supertest": "^1.1.0"
-  }
+  "devDependencies": {}
 }
