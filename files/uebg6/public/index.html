@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <title>MM2 - Übg1</title>
+    <meta charset="UTF-8">
+    <meta name="keywords" content="miniyoutubeapp, html, JavaScript, CSS, Video">
+    <meta name="discription" content="Miniyoutubeapp">
+    <meta name="author" content="Burger, Ebert, Schleußner">
+    <link href="css/uebg1.css" rel="stylesheet" type="text/css">
+    <script data-main="js/appClient" src="js/require.js"></script>
+    <!-- CSS from http://mrbool.com/how-to-style-the-html-5-video-element-with-javascript-and-css/27683 -->
+</head>
+<body>
+<header>
+</header>
+<main>
+    <section id="mainContent">
+        <!-- Template-Engine hier Wrappen -->
+        <ol id="video-one"></ol>
+        <section id="new-video">
+            <input type="text" id="tit" placeholder="Title">
+            <input type="text" id="src" placeholder="Source">
+            <input type="number" id="len" placeholder="Length">
+            <input type="text" id="des" placeholder="Description">
+            <input type="number" id="pc" placeholder="Playcount">
+            <input type="number" id="ran" placeholder="Ranking">
+            <button type="button" class="btn" id="sendbutton">Create the Vid!</button>
+        </section>
+
+        <!-- Ende -- Template-Engine Wrappen -->
+    </section>
+</main>
+<aside>
+    <section id="sideContent">
+        <ol id="video-list"></ol>
+    </section>
+</aside>
+<footer>
+    <span>Diese Abgabe ist von Andreas Burger(s812576), Vivien Ebert(s806998) und Daniel Schleußner(s793388).</span>
+</footer>
+<!--<script src="js/uebg1.js" type="text/javascript"></script>-->
+<script type="text/template" id="video-template">
+    <br>
+    <div class="div_video">
+        <div class="div_videoName">
+            <span>title: <%= title %> | playcount: <%= playcount %> | ranking: <%= ranking %></span>
+        </div>
+        <video id="video" controls>
+            <source src="<%= src %>" type="video/mp4">
+            <source src="<%= src %>" type="video/ogv">
+            <source src="<%= src %>" type="video/webm">
+            Dieser Browser kann das Video nichts abspielen!
+        </video>
+        <h4>description: <%= description %></h4>
+        <div id="div_btnBar2">
+            <button class="btn" id="btn2_play_pause">play</button>
+            <button class="btn" id="btn2_reset">reset</button>
+        </div>
+        <br><br>
+    </div>
+</script>
+<script type="text/template" id="main_video-template">
+    <br>
+    <div class="div_video">
+        <div class="div_videoName">
+            <span>title: <%= title %> | playcount: <%= playcount %> | ranking: <%= ranking %></span>
+        </div>
+        <video id="main_video" controls>
+            <source src="<%= src %>" type="video/mp4">
+            <source src="<%= src %>" type="video/ogv">
+            <source src="<%= src %>" type="video/webm">
+            Dieser Browser kann das Video nichts abspielen!
+        </video>
+        <h4>description: <%= description %></h4>
+        <div class="div_btnBar">
+            <button class="btn" id="btn_play_pause">play/pause</button>
+            <button class="btn" id="btn_reset">reset</button>
+            <label class="label_volume mute">volume mute</label>
+            <input id="checkbox_volume" type="checkbox">
+            <button class="btn" id="btn_prev">previous</button>
+            <button class="btn" id="btn_next">next</button>
+        </div>
+    </div>
+</script>
+</body>
+</html>
